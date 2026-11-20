@@ -1,0 +1,115 @@
+<html>
+<head>
+    <title>Weather Information</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8f5e9;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        .container {
+            background-color: white;
+            width: 320px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #388e3c;
+        }
+
+        hr {
+            border: 1px solid #a5d6a7;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #a5a5a5;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #388e3c;
+        }
+
+        #result {
+            margin-top: 20px;
+            color: #2e7d32;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Weather Information</h1>
+        <hr>
+
+        <input type="text" id="city"
+        placeholder="Enter city name">
+
+        <button onclick="GetData()">Get Data</button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script>
+        function GetData()
+        {
+            let place = document.getElementById("city").value;
+
+            fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(place)}&count=1`)
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.results || data.results.length === 0) {
+                    document.getElementById("result").innerHTML =
+                    "City not found!";
+                    return;
+                }
+
+                let longitude = data.results[0].longitude;
+                let latitude = data.results[0].latitude;
+
+                weather_details(longitude, latitude);
+            })
+            .catch(error => console.log(error));
+        }
+
+        function weather_details(lo, la)
+        {
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m`)
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("result").innerHTML =
+                "Temperature: " +
+                data.current.temperature_2m + " °C";
+
+            })
+            .catch(error => console.log(error));
+        }
+    </script>
+
+</body>
+</html>
